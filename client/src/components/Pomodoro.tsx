@@ -1,21 +1,32 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect } from "react";
+import { TimerContext } from "../context/TimerContext";
+import bell from "../assets/old-church-bell.mp3";
 
-type Time = {
+export type Time = {
   hours: number;
   minutes: number;
   seconds: number;
 };
 
 export default function Pomodoro() {
-  const [time, setTime] = useState<Time>({
-    hours: 0,
-    minutes: 1,
-    seconds: 10,
-  });
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [reset, setReset] = useState<boolean>(true);
-  const [initialTotalSeconds, setInitialTotalSeconds] = useState<number>(0);
-  const [progress, setProgress] = useState<number>(100);
+  const timerContext = useContext(TimerContext);
+
+  if (!timerContext) {
+    throw new Error("TimerMenu must be used within a TimerProvider");
+  }
+  const {
+    time,
+    setTime,
+    handleReset,
+    isActive,
+    setIsActive,
+    reset,
+    setReset,
+    initialTotalSeconds,
+    setInitialTotalSeconds,
+    progress,
+    setProgress,
+  } = timerContext;
 
   const handleTimeChange =
     (timeUnit: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,10 +46,11 @@ export default function Pomodoro() {
       ) {
         value = 0;
       }
-      setTime((prevTime) => ({
-        ...prevTime,
+      const newTime: Time = {
+        ...time,
         [timeUnit]: value,
-      }));
+      };
+      setTime(newTime);
     };
 
   const handleTimerInputKeyPress = (event: React.KeyboardEvent) => {
@@ -56,59 +68,68 @@ export default function Pomodoro() {
     }
   };
 
-  // progress bar
   const radius = 150;
   const stroke = 4;
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  // updating the time
+  useEffect(() => {
+    handleReset();
+  }, [handleReset]);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     if (isActive) {
       timer = setInterval(() => {
-        setTime((prevTime) => {
-          const newTime: Time = { ...prevTime };
-
-          if (newTime.seconds > 0) {
-            newTime.seconds--;
+        const newTime: Time = { ...time };
+        if (newTime.seconds > 0) {
+          newTime.seconds--;
+        } else {
+          if (newTime.minutes > 0) {
+            newTime.minutes--;
+            newTime.seconds = 59;
           } else {
-            if (newTime.minutes > 0) {
-              newTime.minutes--;
+            if (newTime.hours > 0) {
+              newTime.hours--;
+              newTime.minutes = 59;
               newTime.seconds = 59;
             } else {
-              if (newTime.hours > 0) {
-                newTime.hours--;
-                newTime.minutes = 59;
-                newTime.seconds = 59;
-              } else {
-                clearInterval(timer);
-                setIsActive(false);
-              }
+              clearInterval(timer);
+              const audio = new Audio(bell);
+              handleReset();
+              audio.play();
             }
           }
+        }
+        setTime(newTime);
 
-          const remainingSeconds =
-            newTime.hours * 3600 + newTime.minutes * 60 + newTime.seconds;
-          const newProgress: number =
-            (remainingSeconds / initialTotalSeconds) * 100;
-          if (remainingSeconds > initialTotalSeconds) {
-            setInitialTotalSeconds(remainingSeconds);
-          } else {
-            setProgress(newProgress);
-          }
-
-          return newTime;
-        });
+        const remainingSeconds =
+          newTime.hours * 3600 + newTime.minutes * 60 + newTime.seconds;
+        const newProgress: number =
+          (remainingSeconds / initialTotalSeconds) * 100;
+        if (remainingSeconds > initialTotalSeconds) {
+          setInitialTotalSeconds(remainingSeconds);
+        } else {
+          setProgress(newProgress);
+        }
       }, 1000);
     }
 
     return () => {
       clearInterval(timer);
     };
-  }, [initialTotalSeconds, isActive]);
+  }, [
+    handleReset,
+    initialTotalSeconds,
+    setInitialTotalSeconds,
+    isActive,
+    setIsActive,
+    setProgress,
+    setTime,
+    time,
+  ]);
 
   useEffect(() => {
     if (!reset) {
@@ -129,29 +150,25 @@ export default function Pomodoro() {
         time.hours * 3600 + time.minutes * 60 + time.seconds;
       setInitialTotalSeconds(totalSeconds);
     }
-  }, [initialTotalSeconds, time]);
+  }, [
+    initialTotalSeconds,
+    setInitialTotalSeconds,
+    setIsActive,
+    setReset,
+    time.hours,
+    time.minutes,
+    time.seconds,
+  ]);
 
-  const handlePause = () => {
+  const handlePause = useCallback(() => {
     setReset(false);
     setIsActive(false);
-  };
-
-  const handleReset = () => {
-    setReset(true);
-    setIsActive(false);
-    setTime({
-      hours: 0,
-      minutes: 0,
-      seconds: 10,
-    });
-    setInitialTotalSeconds(0);
-    setProgress(100);
-    document.title = "Pomodoro";
-  };
+  }, [setIsActive, setReset]);
 
   useEffect(() => {
     const handleSpacebarPress = (event: KeyboardEvent) => {
       if (event.code === "Space") {
+        event.preventDefault();
         if (isActive) {
           handlePause();
         } else {
@@ -167,12 +184,12 @@ export default function Pomodoro() {
     return () => {
       document.removeEventListener("keydown", handleSpacebarPress);
     };
-  }, [handleStart, isActive]);
+  }, [handlePause, handleReset, handleStart, isActive]);
 
   return (
     <div
-      className="w-1/2 h-1/2 p-4 flex flex-col items-center justify-center
-         bg-stone-900 border-4 border-stone-300 rounded-3xl"
+      className="w-1/2 h-1/2 p-4 pb-6  flex flex-col items-center justify-center
+         bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
       <div
         id="timer"
@@ -209,9 +226,14 @@ export default function Pomodoro() {
             </span>
           </>
         )}
-        {
-          reset && (
-            <div className="absolute w-1/5 flex flex-row items-center justify-center bg-stone-500 rounded-lg ">
+        {reset && (
+          <div className="absolute w-1/5 flex flex-col items-center gap-2 justify-center rounded-lg">
+            <div className="flex flex-row items-center justify-center gap-16 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal ">
+              <span>hr</span>
+              <span>min</span>
+              <span>sec</span>
+            </div>
+            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg ">
               <input
                 disabled={!reset}
                 className={`text-5xl font-bold text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
@@ -249,46 +271,37 @@ export default function Pomodoro() {
                 onKeyDown={handleTimerInputKeyPress}
               />
             </div>
-          )
-          //  : (
-          //   <span id="time" className="absolute text-5xl font-bold text-white">
-          // {`${String(time.hours).padStart(2, "0")}:${String(
-          //   time.minutes
-          // ).padStart(2, "0")}:${String(time.seconds).padStart(2, "0")}`}
-          //   </span>
-          // )
-        }
+          </div>
+        )}
       </div>
 
       <div
         id="button-options"
-        className=" w-1/2 flex flex-row  items-center justify-center gap-[10%] mt-[3%]"
+        className=" mt-[3%]
+        flex flex-row  items-center justify-center rounded-md w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden
+        "
       >
         <button
           id="reset-button"
-          disabled={reset}
           onClick={handleReset}
-          className="flex items-center justify-center w-1/3 h-full bg-stone-300 p-2 "
+          className=" p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
         >
-          Reset (Esc)
+          Reset
         </button>
         <button
           id="start-stop-button"
           onClick={isActive ? handlePause : handleStart}
-          className={`flex w-1/3 h-full p-2 text-center 
+          className={` h-full w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
+           p-2 
           ${
             isActive
-              ? `bg-red-400`
+              ? `bg-red-600`
               : !isActive && !reset
-              ? `bg-green-400`
-              : `bg-stone-300`
+              ? `bg-green-600`
+              : `bg-green-600 `
           }`}
         >{`${
-          isActive
-            ? `Pause (SpacebarIcon)`
-            : !isActive && !reset
-            ? `Resume (SpacebarIcon)`
-            : `Start(SpacebarIcon)`
+          isActive ? `Pause` : !isActive && !reset ? `Resume` : `Start`
         }`}</button>
       </div>
     </div>
