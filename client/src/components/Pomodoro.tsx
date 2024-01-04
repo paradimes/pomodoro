@@ -185,12 +185,12 @@ export default function Pomodoro() {
 
   return (
     <div
-      className="w-1/2 h-1/2 p-4 pb-6  flex flex-col items-center justify-center
+      className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-1/2 p-4 pb-6  flex flex-col items-center justify-center
          bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
       <div
         id="timer"
-        className="flex items-center justify-center mb-4 min-h-[80%]  "
+        className="flex items-center justify-center mb-4 min-h-[80%]"
       >
         {!reset && (
           <>
@@ -223,7 +223,7 @@ export default function Pomodoro() {
           </>
         )}
         {reset && (
-          <div className="absolute w-1/5 flex flex-col items-center gap-2 justify-center rounded-lg">
+          <div className=" w-full  flex flex-col items-center gap-2 justify-center rounded-lg">
             <div className="flex flex-row items-center justify-center gap-16 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal ">
               <span>hr</span>
               <span>min</span>
@@ -274,7 +274,7 @@ export default function Pomodoro() {
       <div
         id="button-options"
         className=" mt-[3%]
-        flex flex-row  items-center justify-center rounded-md w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden
+        flex flex-row  items-center justify-center rounded-md text-sm text- sm:text-base  w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden
         "
       >
         <button
@@ -287,7 +287,7 @@ export default function Pomodoro() {
         <button
           id="start-stop-button"
           onClick={isActive ? handlePause : handleStart}
-          className={`h-full w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
+          className={` w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
            p-2 
           ${
             isActive
