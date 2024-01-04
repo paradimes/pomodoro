@@ -95,11 +95,6 @@ export default function Pomodoro() {
               newTime.hours--;
               newTime.minutes = 59;
               newTime.seconds = 59;
-            } else {
-              clearInterval(timer);
-              const audio = new Audio(bell);
-              handleReset();
-              audio.play();
             }
           }
         }
@@ -109,10 +104,12 @@ export default function Pomodoro() {
           newTime.hours * 3600 + newTime.minutes * 60 + newTime.seconds;
         const newProgress: number =
           (remainingSeconds / initialTotalSeconds) * 100;
-        if (remainingSeconds > initialTotalSeconds) {
-          setInitialTotalSeconds(remainingSeconds);
-        } else {
-          setProgress(newProgress);
+        setProgress(newProgress);
+
+        if (remainingSeconds === 0) {
+          const audio = new Audio(bell);
+          audio.play();
+          handleReset();
         }
       }, 1000);
     }
@@ -209,7 +206,6 @@ export default function Pomodoro() {
                 cy={radius}
               />
               <circle
-                stroke="##84cc16"
                 fill="#1c1917"
                 strokeWidth={stroke}
                 strokeDasharray={circumference + " " + circumference}
@@ -284,25 +280,24 @@ export default function Pomodoro() {
         <button
           id="reset-button"
           onClick={handleReset}
-          className=" p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
+          className="p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
         >
-          Reset
+          <span>Reset (ESC)</span>
         </button>
         <button
           id="start-stop-button"
           onClick={isActive ? handlePause : handleStart}
-          className={` h-full w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
+          className={`h-full w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
            p-2 
           ${
             isActive
-              ? `bg-red-600`
-              : !isActive && !reset
-              ? `bg-green-600`
-              : `bg-green-600 `
+              ? `bg-red-700 hover:bg-red-600 active:bg-red-500 `
+              : `bg-green-700 hover:bg-green-600 active:bg-green-500 `
           }`}
-        >{`${
-          isActive ? `Pause` : !isActive && !reset ? `Resume` : `Start`
-        }`}</button>
+        >
+          {`${isActive ? `Pause` : !isActive && !reset ? `Resume` : `Start`}`}
+          <span> (Spacebar)</span>
+        </button>
       </div>
     </div>
   );

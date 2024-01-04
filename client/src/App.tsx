@@ -7,7 +7,7 @@ import { TimerContext } from "./context/TimerContext";
 export default function App() {
   const [time, setTime] = useState<Time>({
     hours: 0,
-    minutes: 59,
+    minutes: 25,
     seconds: 0,
   });
   const [pomodoroMode, setPomodoroMode] = useState<boolean>(true);

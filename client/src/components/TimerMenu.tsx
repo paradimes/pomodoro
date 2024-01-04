@@ -8,7 +8,6 @@ export default function TimerMenu() {
     throw new Error("TimerMenu must be used within a TimerProvider");
   }
   const {
-    setTime,
     pomodoroMode,
     setPomodoroMode,
     shortBreak,
@@ -27,11 +26,6 @@ export default function TimerMenu() {
     setPomodoroMode(true);
     setShortBreak(false);
     setLongBreak(false);
-    setTime({
-      hours: 0,
-      minutes: 25,
-      seconds: 0,
-    });
   };
 
   const handleShortBreakClick = () => {
@@ -39,11 +33,6 @@ export default function TimerMenu() {
     setPomodoroMode(false);
     setShortBreak(true);
     setLongBreak(false);
-    setTime({
-      hours: 0,
-      minutes: 5,
-      seconds: 0,
-    });
   };
 
   const handleLongBreakClick = () => {
@@ -51,11 +40,6 @@ export default function TimerMenu() {
     setPomodoroMode(false);
     setShortBreak(false);
     setLongBreak(true);
-    setTime({
-      hours: 0,
-      minutes: 10,
-      seconds: 0,
-    });
   };
 
   return (
