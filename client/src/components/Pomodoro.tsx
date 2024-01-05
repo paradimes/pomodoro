@@ -204,7 +204,7 @@ export default function Pomodoro() {
                 r={radius}
                 fill="none"
                 strokeWidth={stroke}
-                stroke="#78716c" //gray
+                stroke="#78716c"
                 cx={circleWidth / 2}
                 cy={circleWidth / 2}
               />
@@ -212,7 +212,7 @@ export default function Pomodoro() {
                 id="circle-progress"
                 r={radius}
                 fill="none"
-                stroke="#f97316" //orange
+                stroke="#f97316"
                 strokeWidth={stroke}
                 strokeDasharray={dashArray}
                 strokeDashoffset={dashOffset}
@@ -223,7 +223,10 @@ export default function Pomodoro() {
                 transform={`rotate(-90 ${circleWidth / 2} ${circleWidth / 2})`}
               />
             </svg>
-            <span id="time" className="absolute text-5xl font-bold text-white">
+            <span
+              id="time"
+              className="absolute text-6xl font-medium text-white"
+            >
               {` ${
                 time.hours ? String(time.hours).padStart(2, "0") + ":" : ""
               }${String(time.minutes).padStart(2, "0")}:${String(
@@ -234,15 +237,15 @@ export default function Pomodoro() {
         )}
         {reset && (
           <div className=" w-full  flex flex-col items-center gap-2 justify-center rounded-lg">
-            <div className="flex flex-row items-center justify-center gap-16 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal ">
+            <div className="flex flex-row items-center justify-center gap-20 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal ">
               <span>hr</span>
               <span>min</span>
               <span>sec</span>
             </div>
-            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg ">
+            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg px-2 ">
               <input
                 disabled={!reset}
-                className={`text-5xl font-bold text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
                 type="number"
                 min="0"
                 max="10"
@@ -250,12 +253,12 @@ export default function Pomodoro() {
                 onChange={handleTimeChange("hours")}
                 onKeyDown={handleTimerInputKeyPress}
               />
-              <span className="text-5xl font-bold text-white bg-transparent">
+              <span className="text-6xl font-medium text-white bg-transparent">
                 :
               </span>
               <input
                 disabled={!reset}
-                className={`text-5xl font-bold text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
                 type="number"
                 min="0"
                 max="59"
@@ -263,12 +266,12 @@ export default function Pomodoro() {
                 onChange={handleTimeChange("minutes")}
                 onKeyDown={handleTimerInputKeyPress}
               />
-              <span className="text-5xl font-bold text-white bg-transparent">
+              <span className="text-6xl font-medium text-white bg-transparent">
                 :
               </span>
               <input
                 disabled={!reset}
-                className={`text-5xl font-bold text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
                 type="number"
                 min="0"
                 max="59"
