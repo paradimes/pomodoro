@@ -28,6 +28,12 @@ export default function Pomodoro() {
     setProgress,
   } = timerContext;
 
+  const radius = 150;
+  const stroke = 5;
+  const circleWidth = 2 * radius + stroke;
+  const dashArray = 2 * Math.PI * radius;
+  const dashOffset = dashArray - (dashArray * progress) / 100;
+
   const handleTimeChange =
     (timeUnit: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       let value = parseInt(event.target.value, 10);
@@ -67,12 +73,6 @@ export default function Pomodoro() {
       event.preventDefault();
     }
   };
-
-  const radius = 150;
-  const stroke = 4;
-  const normalizedRadius = radius - stroke * 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   useEffect(() => {
     handleReset();
@@ -194,31 +194,41 @@ export default function Pomodoro() {
       >
         {!reset && (
           <>
-            <svg id="timer-progress-bar" height={radius * 2} width={radius * 2}>
+            <svg
+              width={circleWidth}
+              height={circleWidth}
+              viewBox={`0 0 ${circleWidth} ${circleWidth}`}
+            >
               <circle
-                stroke="#f97316"
-                fill="#a8a29e"
+                id="circle-background"
+                r={radius}
+                fill="none"
                 strokeWidth={stroke}
-                strokeDasharray={circumference + " " + circumference}
-                style={{ strokeDashoffset }}
-                r={normalizedRadius}
-                cx={radius}
-                cy={radius}
+                stroke="#78716c" //gray
+                cx={circleWidth / 2}
+                cy={circleWidth / 2}
               />
               <circle
-                fill="#1c1917"
+                id="circle-progress"
+                r={radius}
+                fill="none"
+                stroke="#f97316" //orange
                 strokeWidth={stroke}
-                strokeDasharray={circumference + " " + circumference}
-                style={{ strokeDashoffset }}
-                r={normalizedRadius - 2}
-                cx={radius}
-                cy={radius}
+                strokeDasharray={dashArray}
+                strokeDashoffset={dashOffset}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                cx={circleWidth / 2}
+                cy={circleWidth / 2}
+                transform={`rotate(-90 ${circleWidth / 2} ${circleWidth / 2})`}
               />
             </svg>
             <span id="time" className="absolute text-5xl font-bold text-white">
-              {`${String(time.hours).padStart(2, "0")}:${String(
-                time.minutes
-              ).padStart(2, "0")}:${String(time.seconds).padStart(2, "0")}`}
+              {` ${
+                time.hours ? String(time.hours).padStart(2, "0") + ":" : ""
+              }${String(time.minutes).padStart(2, "0")}:${String(
+                time.seconds
+              ).padStart(2, "0")}`}
             </span>
           </>
         )}
@@ -280,7 +290,7 @@ export default function Pomodoro() {
         <button
           id="reset-button"
           onClick={handleReset}
-          className="p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
+          className="p-2 w-1/2 h-full text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
         >
           <span>Reset (ESC)</span>
         </button>
