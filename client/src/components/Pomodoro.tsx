@@ -185,12 +185,13 @@ export default function Pomodoro() {
 
   return (
     <div
+      id="main-container"
       className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-1/2 p-4 pb-6  flex flex-col items-center justify-center
          bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
       <div
-        id="timer"
-        className="flex items-center justify-center mb-4 min-h-[80%]"
+        id="timer-container"
+        className="flex items-center justify-center mb-4 min-h-[80%] w-80 "
       >
         {!reset && (
           <>
@@ -237,15 +238,15 @@ export default function Pomodoro() {
         )}
         {reset && (
           <div className=" w-full  flex flex-col items-center gap-2 justify-center rounded-lg">
-            <div className="flex flex-row items-center justify-center gap-20 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal ">
+            <div className="flex flex-row items-center justify-center gap-20 bg-stone-900 w-full rounded-lg text-sm text-stone-400 font-normal   ">
               <span>hr</span>
               <span>min</span>
               <span>sec</span>
             </div>
-            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg px-2 ">
+            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg px-2  ">
               <input
                 disabled={!reset}
-                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80 w-1/3`}
                 type="number"
                 min="0"
                 max="10"
@@ -258,7 +259,7 @@ export default function Pomodoro() {
               </span>
               <input
                 disabled={!reset}
-                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80 w-1/3`}
                 type="number"
                 min="0"
                 max="59"
@@ -271,7 +272,7 @@ export default function Pomodoro() {
               </span>
               <input
                 disabled={!reset}
-                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80`}
+                className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80 w-1/3`}
                 type="number"
                 min="0"
                 max="59"
@@ -287,13 +288,13 @@ export default function Pomodoro() {
       <div
         id="button-options"
         className=" mt-[3%]
-        flex flex-row  items-center justify-center rounded-md text-sm text- sm:text-base  w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden
+        flex flex-row  items-center justify-center rounded-md text-sm text- sm:text-base w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden py-4
         "
       >
         <button
           id="reset-button"
           onClick={handleReset}
-          className="p-2 w-1/2 h-full text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
+          className="p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
         >
           <span>Reset (ESC)</span>
         </button>
