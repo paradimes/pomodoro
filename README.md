@@ -4,7 +4,10 @@
 
 Apple-themed Pomodoro timer. Love the design and simplicity of the native Apple timer and wanted to add Pomodoro functionality to it. 
 
-Learn about the Pomodoro technique here: https://en.wikipedia.org/wiki/Pomodoro_Technique
+**Link**: https://pomodoro-zeta-ruddy.vercel.app/
+
+**Learn about the Pomodoro technique here:** https://en.wikipedia.org/wiki/Pomodoro_Technique
+
 
 ## Installation
 
