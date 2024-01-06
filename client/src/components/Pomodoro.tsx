@@ -186,7 +186,7 @@ export default function Pomodoro() {
   return (
     <div
       id="main-container"
-      className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-1/2 p-4 pb-6  flex flex-col items-center justify-center
+      className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-1/2 p-4 pb-6 flex flex-col items-center justify-center
          bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
       <div
@@ -285,32 +285,25 @@ export default function Pomodoro() {
         )}
       </div>
 
-      <div
-        id="button-options"
-        className=" mt-[3%]
-        flex flex-row  items-center justify-center rounded-md text-sm text- sm:text-base w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden py-4
-        "
-      >
+      <div className="mt-5 flex flex-row  items-center justify-center rounded-md text-sm sm:text-base w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden">
         <button
           id="reset-button"
           onClick={handleReset}
-          className="p-2 w-1/2 text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500 border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none"
+          className={`w-1/2 h-full text-stone-400 text-center focus:bg-stone-700 hover:bg-stone-600 active:bg-stone-500
+       border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none   `}
         >
-          <span>Reset (ESC)</span>
+          Reset
         </button>
         <button
           id="start-stop-button"
           onClick={isActive ? handlePause : handleStart}
-          className={` w-1/2 text-stone-200 text-center focus:outline-none focus:border-none
-           p-2 
-          ${
+          className={`w-1/2 h-full text-stone-200 text-center focus:outline-none focus:border-none  ${
             isActive
               ? `bg-red-700 hover:bg-red-600 active:bg-red-500 `
               : `bg-green-700 hover:bg-green-600 active:bg-green-500 `
-          }`}
+          } `}
         >
           {`${isActive ? `Pause` : !isActive && !reset ? `Resume` : `Start`}`}
-          <span> (Spacebar)</span>
         </button>
       </div>
     </div>
