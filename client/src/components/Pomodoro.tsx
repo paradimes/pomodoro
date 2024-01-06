@@ -289,7 +289,7 @@ export default function Pomodoro() {
         <button
           id="reset-button"
           onClick={handleReset}
-          className={`w-1/2 h-full text-stone-400 text-center focus:bg-stone-700 hover:bg-stone-600 active:bg-stone-500
+          className={`w-1/2 h-full text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500
        border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none   `}
         >
           Reset
