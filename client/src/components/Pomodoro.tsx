@@ -186,7 +186,7 @@ export default function Pomodoro() {
   return (
     <div
       id="main-container"
-      className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-1/2 p-4 pb-6 flex flex-col items-center justify-center
+      className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-3/5 p-4 pb-6 flex flex-col items-center justify-center
          bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
       <div
@@ -243,7 +243,7 @@ export default function Pomodoro() {
               <span>min</span>
               <span>sec</span>
             </div>
-            <div className=" w-full flex flex-row items-center justify-center bg-stone-500 rounded-lg px-2  ">
+            <div className=" w-full flex flex-row items-center justify-center bg-stone-800 rounded-lg px-2 border-2 border-stone-700 ">
               <input
                 disabled={!reset}
                 className={`text-6xl font-medium text-white bg-transparent text-center border-none outline-none focus:bg-orange-400 focus:bg-opacity-80 w-1/3`}
