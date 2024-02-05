@@ -3,6 +3,7 @@ import Pomodoro, { Time } from "./components/Pomodoro";
 import "./index.css";
 import { useCallback, useState } from "react";
 import { TimerContext } from "./context/TimerContext";
+import TimerTesting from "./components/TimerTesting";
 
 export default function App() {
   const [time, setTime] = useState<Time>({
@@ -72,6 +73,7 @@ export default function App() {
       <div className="w-full h-screen flex flex-col gap-5 items-center justify-center bg-stone-900">
         <TimerMenu />
         <Pomodoro />
+        <TimerTesting />
       </div>
     </TimerContext.Provider>
   );
