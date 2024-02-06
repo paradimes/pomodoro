@@ -28,18 +28,20 @@ export default function Pomodoro() {
     setProgress,
   } = timerContext;
 
+  // Progress bar properties
   const radius = 150;
   const stroke = 5;
   const circleWidth = 2 * radius + stroke;
   const dashArray = 2 * Math.PI * radius;
   const dashOffset = dashArray - (dashArray * progress) / 100;
 
+  // Time input onChange handler
   const handleTimeChange =
     (timeUnit: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       let value = parseInt(event.target.value, 10);
       if (timeUnit === "hours" && value > 10) {
         value = 10;
-      } else if (timeUnit === "Hours" && value < 0) {
+      } else if (timeUnit === "hours" && value < 0) {
         value = 0;
       } else if (
         (timeUnit === "minutes" || timeUnit === "seconds") &&
@@ -59,6 +61,7 @@ export default function Pomodoro() {
       setTime(newTime);
     };
 
+  // Time input onKeyDown handler
   const handleTimerInputKeyPress = (event: React.KeyboardEvent) => {
     const value = event.key;
     if (
@@ -74,10 +77,12 @@ export default function Pomodoro() {
     }
   };
 
+  // Initial reset
   useEffect(() => {
     handleReset();
   }, [handleReset]);
 
+  // Timer countdown
   useEffect(() => {
     let timer: NodeJS.Timeout;
 

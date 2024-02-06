@@ -1,17 +1,35 @@
 import { useEffect, useState } from "react";
 import TimerWorker from "../../public/countdownWorker.js?worker";
+import { Time } from "./Pomodoro";
 
 export default function TimerTesting() {
-  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [time, setTime] = useState<string>("");
   const [worker, setWorker] = useState<Worker | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [timeFormatted, setTimeFormatted] = useState<Time>({
+    hours: 0,
+    minutes: 25,
+    seconds: 0,
+  });
+  const [progress, setProgress] = useState<number>(100);
+  const [initialTotalSeconds, setInitialTotalSeconds] = useState<number>(0);
 
   useEffect(() => {
     const newWorker = new TimerWorker();
 
     newWorker.onmessage = (e) => {
-      setTimeLeft(e.data);
-      document.title = `${e.data} Pomodoro`;
+      const remainingSeconds = e.data;
+      setTime(remainingSeconds);
+      document.title = `${remainingSeconds} Pomodoro`;
+
+      const hours = Math.floor(remainingSeconds / 3600);
+      const minutes = Math.floor((remainingSeconds % 3600) / 60);
+      const seconds = remainingSeconds % 60;
+
+      setTimeFormatted({ hours, minutes, seconds });
+
+      const newProgress = (remainingSeconds / initialTotalSeconds) * 100;
+      setProgress(newProgress);
     };
 
     setWorker(newWorker);
@@ -20,11 +38,24 @@ export default function TimerTesting() {
       newWorker.terminate();
       document.title = `Pomodoro`;
     };
-  }, []);
+  }, [initialTotalSeconds]);
 
   const startTimer = () => {
     if (worker) {
-      const endTime = new Date().getTime() + 5 * 60 * 1000; // 5 mins in milliseconds
+      const timerDurationMilliseconds =
+        (timeFormatted.hours * 3600 +
+          timeFormatted.minutes * 60 +
+          timeFormatted.seconds) *
+        1000;
+      const endTime = new Date().getTime() + timerDurationMilliseconds;
+      if (initialTotalSeconds === 0) {
+        // const totalSeconds: number =
+        //   timeFormatted.hours * 3600 +
+        //   timeFormatted.minutes * 60 +
+        //   timeFormatted.seconds;
+        setInitialTotalSeconds(timerDurationMilliseconds / 1000);
+      }
+
       worker.postMessage({ action: "START", endTime: endTime });
     }
   };
@@ -46,14 +77,20 @@ export default function TimerTesting() {
   const resetTimer = () => {
     if (worker) {
       worker.postMessage({ action: "RESET" });
-      setTimeLeft("");
+      setTime("");
+      setTimeFormatted({ hours: 0, minutes: 25, seconds: 0 });
       document.title = `Pomodoro`;
     }
   };
 
   return (
     <div className="text-white flex flex-col gap-3">
-      Time Left : {timeLeft}
+      Time Left : {time}
+      <span>
+        Time Formatted : {timeFormatted.hours}:{timeFormatted.minutes}:
+        {timeFormatted.seconds}
+      </span>
+      <span>Progress: {progress}</span>
       <div className="flex flex-row gap-3">
         <button
           className="flex px-2 py-1 bg-stone-300 text-black"
