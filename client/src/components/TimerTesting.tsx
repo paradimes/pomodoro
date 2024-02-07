@@ -3,7 +3,7 @@ import TimerWorker from "../../public/countdownWorker.js?worker";
 import { Time } from "./Pomodoro";
 
 export default function TimerTesting() {
-  const [time, setTime] = useState<string>("");
+  const [time, setTime] = useState<number>(0);
   const [worker, setWorker] = useState<Worker | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [timeFormatted, setTimeFormatted] = useState<Time>({
@@ -49,10 +49,6 @@ export default function TimerTesting() {
         1000;
       const endTime = new Date().getTime() + timerDurationMilliseconds;
       if (initialTotalSeconds === 0) {
-        // const totalSeconds: number =
-        //   timeFormatted.hours * 3600 +
-        //   timeFormatted.minutes * 60 +
-        //   timeFormatted.seconds;
         setInitialTotalSeconds(timerDurationMilliseconds / 1000);
       }
 
@@ -77,7 +73,7 @@ export default function TimerTesting() {
   const resetTimer = () => {
     if (worker) {
       worker.postMessage({ action: "RESET" });
-      setTime("");
+      setTime(0);
       setTimeFormatted({ hours: 0, minutes: 25, seconds: 0 });
       document.title = `Pomodoro`;
     }

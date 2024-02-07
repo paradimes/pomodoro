@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import TimerMenu from "./components/TimerMenu";
 import Pomodoro, { Time } from "./components/Pomodoro";
 import "./index.css";
 import { useCallback, useState } from "react";
 import { TimerContext } from "./context/TimerContext";
 import TimerTesting from "./components/TimerTesting";
+import PomodoroClone from "./components/PomodoroClone";
 
 export default function App() {
   const [time, setTime] = useState<Time>({
@@ -72,8 +74,9 @@ export default function App() {
     >
       <div className="w-full h-screen flex flex-col gap-5 items-center justify-center bg-stone-900">
         <TimerMenu />
-        <Pomodoro />
+        {/* <Pomodoro /> */}
         <TimerTesting />
+        <PomodoroClone />
       </div>
     </TimerContext.Provider>
   );
