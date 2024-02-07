@@ -22,24 +22,24 @@ export default function TimerMenu() {
   }, [setPomodoroMode]);
 
   const handlePomodoroClick = () => {
-    handleReset();
     setPomodoroMode(true);
     setShortBreak(false);
     setLongBreak(false);
+    handleReset();
   };
 
   const handleShortBreakClick = () => {
-    handleReset();
     setPomodoroMode(false);
     setShortBreak(true);
     setLongBreak(false);
+    handleReset();
   };
 
   const handleLongBreakClick = () => {
-    handleReset();
     setPomodoroMode(false);
     setShortBreak(false);
     setLongBreak(true);
+    handleReset();
   };
 
   return (

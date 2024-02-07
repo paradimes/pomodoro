@@ -19,6 +19,10 @@ export type TimerContextType = {
   setInitialTotalSeconds: (value: number) => void;
   progress: number;
   setProgress: (value: number) => void;
+  worker: Worker | null;
+  setWorker: (value: Worker) => void;
+  totalRemainingSeconds: number;
+  setTotalRemainingSeconds: (value: number) => void;
 };
 
 export const TimerContext = createContext<TimerContextType | undefined>(

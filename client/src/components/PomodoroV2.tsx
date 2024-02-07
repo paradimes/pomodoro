@@ -1,6 +1,7 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import TimerWorker from "../../public/countdownWorker.js?worker";
 import { TimerContext } from "../context/TimerContext";
+import bell from "../assets/old-church-bell.mp3";
 
 export type Time = {
   hours: number;
@@ -8,7 +9,7 @@ export type Time = {
   seconds: number;
 };
 
-export default function TimerTesting() {
+export default function PomodoroV2() {
   const timerContext = useContext(TimerContext);
 
   if (!timerContext) {
@@ -17,7 +18,7 @@ export default function TimerTesting() {
   const {
     time,
     setTime,
-    //   handleReset,
+    handleReset,
     isActive,
     setIsActive,
     reset,
@@ -26,10 +27,11 @@ export default function TimerTesting() {
     setInitialTotalSeconds,
     progress,
     setProgress,
+    worker,
+    setWorker,
+    totalRemainingSeconds,
+    setTotalRemainingSeconds,
   } = timerContext;
-
-  const [worker, setWorker] = useState<Worker | null>(null);
-  const [totalRemainingSeconds, setTotalRemainingSeconds] = useState<number>(0);
 
   // Progress bar properties
   const radius = 150;
@@ -37,6 +39,43 @@ export default function TimerTesting() {
   const circleWidth = 2 * radius + stroke;
   const dashArray = 2 * Math.PI * radius;
   const dashOffset = dashArray - (dashArray * progress) / 100;
+
+  // Start and Pause handlers
+  const handleStart = useCallback(() => {
+    if (worker) {
+      setReset(false);
+      setIsActive(true);
+      const timerDurationMilliseconds =
+        (time.hours * 3600 + time.minutes * 60 + time.seconds) * 1000;
+      const endTime = new Date().getTime() + timerDurationMilliseconds;
+      if (initialTotalSeconds === 0) {
+        setInitialTotalSeconds(timerDurationMilliseconds / 1000);
+      }
+
+      worker.postMessage({ action: "START", endTime: endTime });
+    }
+  }, [
+    initialTotalSeconds,
+    setInitialTotalSeconds,
+    setIsActive,
+    setReset,
+    time.hours,
+    time.minutes,
+    time.seconds,
+    worker,
+  ]);
+
+  const handlePause = useCallback(() => {
+    if (worker) {
+      if (!isActive) {
+        worker.postMessage({ action: "RESUME" });
+      } else {
+        worker.postMessage({ action: "PAUSE" });
+      }
+      setIsActive(!isActive);
+      setReset(false);
+    }
+  }, [isActive, setIsActive, setReset, worker]);
 
   // Time input onChange handler
   const handleTimeChange =
@@ -80,84 +119,64 @@ export default function TimerTesting() {
     }
   };
 
+  // Initial reset
+  useEffect(() => {
+    handleReset();
+  }, [handleReset]);
+
+  // Web Worker initialization
   useEffect(() => {
     const newWorker = new TimerWorker();
-    console.log("abc", newWorker);
 
     newWorker.onmessage = (e) => {
       const remainingSeconds = e.data;
       setTotalRemainingSeconds(remainingSeconds);
-      document.title = `${remainingSeconds} Pomodoro`;
 
       const hours = Math.floor(remainingSeconds / 3600);
       const minutes = Math.floor((remainingSeconds % 3600) / 60);
       const seconds = remainingSeconds % 60;
 
       setTime({ hours, minutes, seconds });
-
-      const newProgress = (remainingSeconds / initialTotalSeconds) * 100;
-      setProgress(newProgress);
     };
 
     setWorker(newWorker);
 
     return () => {
       newWorker.terminate();
-      document.title = `Pomodoro`;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleStart = useCallback(() => {
-    console.log("handleStart called");
-    if (worker) {
-      setReset(false);
-      setIsActive(true);
-      const timerDurationMilliseconds =
-        (time.hours * 3600 + time.minutes * 60 + time.seconds) * 1000;
-      const endTime = new Date().getTime() + timerDurationMilliseconds;
-      if (initialTotalSeconds === 0) {
-        setInitialTotalSeconds(timerDurationMilliseconds / 1000);
-      }
-
-      worker.postMessage({ action: "START", endTime: endTime });
+  // Timer progress handler (in-progress + finished)
+  useEffect(() => {
+    if (isActive) {
+      const newProgress = (totalRemainingSeconds / initialTotalSeconds) * 100;
+      setProgress(newProgress);
     }
-  }, [
-    initialTotalSeconds,
-    setInitialTotalSeconds,
-    setIsActive,
-    setReset,
-    time.hours,
-    time.minutes,
-    time.seconds,
-    worker,
-  ]);
 
-  const handlePause = useCallback(() => {
-    console.log("handlePause called");
-
-    if (worker) {
-      if (!isActive) {
-        worker.postMessage({ action: "RESUME" });
-      } else {
-        worker.postMessage({ action: "PAUSE" });
-      }
-      setIsActive(!isActive);
-      setReset(false);
+    if (totalRemainingSeconds === 0 && isActive) {
+      const audio = new Audio(bell);
+      audio.play();
+      handleReset();
     }
-  }, [isActive, setIsActive, setReset, worker]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalRemainingSeconds]);
 
-  const handleReset = useCallback(() => {
-    if (worker) {
-      worker.postMessage({ action: "RESET" });
-      setReset(true);
-      setIsActive(false);
-      setTotalRemainingSeconds(0);
-      setTime({ hours: 0, minutes: 25, seconds: 0 });
-      document.title = `Pomodoro`;
+  // Document title updates
+  useEffect(() => {
+    if (!reset) {
+      document.title = `(${
+        time.hours ? String(time.hours).padStart(2, "0") + ":" : ""
+      }${String(time.minutes).padStart(2, "0")}:${String(time.seconds).padStart(
+        2,
+        "0"
+      )}) Pomodoro`;
+    } else {
+      document.title = "Pomodoro";
     }
-  }, [setIsActive, setReset, setTime, worker]);
+  }, [reset, time.hours, time.minutes, time.seconds]);
 
+  // Timer Start and Reset by key handler
   useEffect(() => {
     const handleSpacebarPress = (event: KeyboardEvent) => {
       if (event.code === "Space") {
@@ -183,16 +202,8 @@ export default function TimerTesting() {
     <div
       id="main-container"
       className=" w-11/12 sm:w-4/5 md:w-3/4 2xl:w-1/2 h-3/5 p-4 pb-6 flex flex-col items-center justify-center
-         bg-red-900 border-2 border-stone-700 rounded-3xl"
+         bg-stone-900 border-2 border-stone-700 rounded-3xl"
     >
-      <div id="og-time-container" className="flex flex-col text-white">
-        <span>Time Left : {totalRemainingSeconds}</span>
-        <span>
-          Time Formatted : {time.hours}:{time.minutes}:{time.seconds}
-        </span>
-        <span>Progress: {progress}</span>
-      </div>
-
       <div
         id="timer-container"
         className="flex items-center justify-center mb-4 min-h-[80%] w-80 "
@@ -289,24 +300,25 @@ export default function TimerTesting() {
         )}
       </div>
 
-      <div id="buttons-container" className="flex flex-row gap-3">
+      <div className="mt-5 flex flex-row  items-center justify-center rounded-md text-sm sm:text-base w-5/6 sm:w-4/6 md:w-3/5 lg:w-1/2 bg-stone-800 border-[0.5px] border-stone-600 overflow-hidden">
         <button
-          className="flex px-2 py-1 bg-stone-300 text-black"
-          onClick={handleStart}
-        >
-          Start
-        </button>
-        <button
-          className="flex px-2 py-1 bg-stone-300 text-black"
-          onClick={handlePause}
-        >
-          Pause/Resume
-        </button>
-        <button
-          className="flex px-2 py-1 bg-stone-300 text-black"
+          id="reset-button"
           onClick={handleReset}
+          className={`w-1/2 h-full text-stone-400 text-center  hover:bg-stone-600 active:bg-stone-500
+       border-r-[0.5px] border-stone-600 focus:outline-none focus:border-none   `}
         >
           Reset
+        </button>
+        <button
+          id="start-stop-button"
+          onClick={isActive ? handlePause : handleStart}
+          className={`w-1/2 h-full text-stone-200 text-center focus:outline-none focus:border-none  ${
+            isActive
+              ? `bg-red-700 hover:bg-red-600 active:bg-red-500 `
+              : `bg-green-700 hover:bg-green-600 active:bg-green-500 `
+          } `}
+        >
+          {`${isActive ? `Pause` : !isActive && !reset ? `Resume` : `Start`}`}
         </button>
       </div>
     </div>

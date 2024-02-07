@@ -38,7 +38,8 @@ export default function TimerTesting() {
       newWorker.terminate();
       document.title = `Pomodoro`;
     };
-  }, [initialTotalSeconds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const startTimer = () => {
     if (worker) {

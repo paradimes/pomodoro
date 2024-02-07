@@ -3,19 +3,16 @@ let pauseTime = null;
 let intervalId = null;
 
 const updateCountdown = () => {
-  console.log("hello from updateCountdown()");
   const currentTime = Date.now();
   const timeLeft = countdownTime - currentTime;
-  let secondsLeft;
 
-  // Check if the countdown is complete
   if (timeLeft <= 0) {
-    clearInterval(intervalId);
+    // clearInterval(intervalId);
+    postMessage(0);
   } else {
-    // Calculate remaining time and post message
-    secondsLeft = Math.round(timeLeft / 1000);
+    const secondsLeft = Math.round(timeLeft / 1000);
+    postMessage(secondsLeft);
   }
-  postMessage(secondsLeft);
 };
 
 self.onmessage = (e) => {
@@ -25,7 +22,6 @@ self.onmessage = (e) => {
       clearInterval(intervalId);
     }
     intervalId = setInterval(updateCountdown, 1000);
-    console.log("WEBWORKER START");
     pauseTime = null; // Reset pause time
   } else if (e.data.action === "RESET") {
     clearInterval(intervalId);
@@ -38,7 +34,6 @@ self.onmessage = (e) => {
     intervalId = null;
     pauseTime = Date.now();
     // postMessage("PAUSED");
-    console.log("WEBWORKER PAUSED");
   } else if (e.data.action === "RESUME") {
     if (countdownTime && intervalId === null && pauseTime) {
       const pausedDuration = Date.now() - pauseTime;
@@ -46,7 +41,6 @@ self.onmessage = (e) => {
       intervalId = setInterval(updateCountdown, 1000);
       pauseTime = null;
       // postMessage("RESUMED");
-      console.log("WEBWORKER RESUMED");
     }
   }
 };
