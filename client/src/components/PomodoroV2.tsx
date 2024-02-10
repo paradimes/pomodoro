@@ -3,6 +3,9 @@ import TimerWorker from "../../public/countdownWorker.js?worker";
 import { TimerContext } from "../context/TimerContext";
 import bell from "../assets/old-church-bell.mp3";
 
+const audio = new Audio(bell);
+audio.preload = "auto";
+
 export type Time = {
   hours: number;
   minutes: number;
@@ -155,7 +158,6 @@ export default function PomodoroV2() {
     }
 
     if (totalRemainingSeconds === 0 && isActive) {
-      const audio = new Audio(bell);
       audio.play();
       handleReset();
     }
